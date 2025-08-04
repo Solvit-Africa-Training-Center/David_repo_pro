@@ -1,0 +1,125 @@
+{% extends 'lostfound_app/base.html' %}
+
+{% block title %}Home - Lost & Found{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-bg min-h-screen flex items-center justify-center relative">
+    <div class="blur-bg absolute inset-0"></div>
+    <div class="relative z-10 text-center text-white max-w-4xl mx-auto px-4">
+        <h1 class="text-6xl font-bold mb-6">Reuniting You With What Matters Most</h1>
+        <p class="text-xl mb-12 text-gray-200">Help others find what they've lost and return what you've found.</p>
+        
+        {% if user.is_authenticated %}
+            <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                <a href="{% url 'post_lost' %}" class="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors flex items-center justify-center space-x-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    <span>Post Lost Item</span>
+                </a>
+                <a href="{% url 'post_found' %}" class="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors flex items-center justify-center space-x-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <span>Post Found Item</span>
+                </a>
+            </div>
+        {% else %}
+            <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                <a href="{% url 'signup' %}" class="bg-primary hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors">
+                    Sign Up
+                </a>
+                <a href="{% url 'login' %}" class="bg-gray-600 hover:bg-gray-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors">
+                    Login
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Content Section -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    {% if query %}
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Search Results for "{{ query }}"</h2>
+            <p class="text-gray-600 text-lg">{{ items.count }} item{{ items.count|pluralize }} found</p>
+        </div>
+    {% endif %}
+
+    {% if items %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for item in items %}
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+                    {% if item.image %}
+                        <img src="{{ item.image.url }}" alt="{{ item.title }}" class="w-full h-48 object-cover">
+                    {% else %}
+                        <div class="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                            <span class="text-gray-400 text-6xl">
+                                {% if item.post_type == 'lost' %}🚨{% else %}✅{% endif %}
+                            </span>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="px-3 py-1 rounded-full text-sm font-medium {% if item.post_type == 'lost' %}bg-red-100 text-red-800{% else %}bg-green-100 text-green-800{% endif %}">
+                                {{ item.get_post_type_display }}
+                            </span>
+                            <span class="text-sm text-gray-500">{{ item.created_at|date:"M d, Y" }}</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">{{ item.title }}</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">{{ item.description|truncatewords:20 }}</p>
+                        
+                        <div class="flex items-center text-sm text-gray-500 mb-4">
+                            <span class="mr-4 flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                {{ item.location }}
+                            </span>
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                {{ item.date|date:"M d, Y" }}
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-500">by {{ item.user.username }}</span>
+                            <a href="{% url 'item_detail' item.id %}" class="text-primary hover:text-blue-600 font-medium flex items-center">
+                                View Details
+                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-16">
+            <div class="text-8xl mb-6">📦</div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">No items found</h2>
+            <p class="text-gray-600 text-lg mb-8">
+                {% if query %}
+                    No items match your search criteria.
+                {% else %}
+                    No lost or found items have been posted yet. Be the first to post!
+                {% endif %}
+            </p>
+            {% if user.is_authenticated %}
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="{% url 'post_lost' %}" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                        Post Your First Item
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

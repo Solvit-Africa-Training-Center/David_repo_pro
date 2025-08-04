@@ -1,0 +1,40 @@
+{% extends 'lostfound_app/base.html' %}
+
+{% block title %}Delete Post - Lost & Found{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto">
+    <div class="bg-white rounded-lg shadow-md p-8">
+        <div class="text-center mb-8">
+            <div class="text-6xl mb-4">⚠️</div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Delete Post</h1>
+            <p class="text-gray-600">Are you sure you want to delete this post?</p>
+        </div>
+
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <h3 class="font-semibold text-red-900 mb-2">{{ item.title }}</h3>
+            <p class="text-red-700 text-sm">{{ item.description|truncatewords:20 }}</p>
+            <div class="flex items-center mt-2 text-sm text-red-600">
+                <span class="mr-4">📍 {{ item.location }}</span>
+                <span>📅 {{ item.date|date:"M d, Y" }}</span>
+            </div>
+        </div>
+
+        <div class="text-center text-gray-600 mb-6">
+            <p>This action cannot be undone. The post will be permanently deleted.</p>
+        </div>
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            <div class="flex space-x-4">
+                <button type="submit" class="flex-1 bg-red-500 text-white py-3 px-4 rounded-md hover:bg-red-600 transition-colors font-medium">
+                    🗑️ Delete Post
+                </button>
+                <a href="{% url 'my_posts' %}" class="flex-1 bg-gray-300 text-gray-700 py-3 px-4 rounded-md hover:bg-gray-400 transition-colors font-medium text-center">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 
