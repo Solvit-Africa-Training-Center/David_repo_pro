@@ -1,6 +1,9 @@
 from django.contrib import admin
 from .models import Item
 
+admin.site.site_header = "Lost & Found admin portal"
+admin.site.site_title = "admin portal"
+
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
     list_display = ('title', 'post_type', 'user', 'location', 'date', 'created_at')
